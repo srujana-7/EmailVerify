@@ -1,0 +1,52 @@
+// Load the AWS SDK for Node.js
+const AWS = require('aws-sdk');
+const express = require('express')
+const company = require('../models/user')
+
+const router = new express.Router()
+const jwt = require('jsonwebtoken')
+
+
+
+const SES_CONFIG = {
+    accessKeyId: '<SES IAM user access key>',
+    secretAccessKey: '<SES IAM user secret access key>',
+    region: 'us-west-2',
+};
+
+const AWS_SES = new AWS.SES(SES_CONFIG);
+
+let params = {
+    // send to list
+    Destination: {
+        ToAddresses: [
+           'xyz@test.com'
+        ]
+    },
+    Message: {
+        Body: {
+            Html: {
+                Charset: "UTF-8",
+                Data: "<p>this is test body.</p>"
+            },
+            Text: {
+                Charset: "UTF-8",
+                Data: 'Hey, this is test.'
+            }
+        },
+        
+        Subject: {
+            Charset: 'UTF-8',
+            Data: "test"
+        }
+    },
+    Source: 'abc@test.com', // must relate to verified SES account
+    ReplyToAddresses: [
+        'test@test.com',
+    ],
+};
+// this sends the email
+AWS_SES.sendEmail(params, (err, data) => {
+if (err) console.log(err)
+else console.log(data)
+})
